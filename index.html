@@ -308,9 +308,9 @@
         }
 
         .jk-text {
-            font-size: 55px; /* REDUCED: Made font size smaller */
-            color: #ffcc00; 
-            text-shadow: 4px 4px 0px #cc5200, 8px 8px 0px #662900;
+            font-size: 55px; 
+            color: #ff3366; /* Match the pink heart color */
+            text-shadow: 4px 4px 0px #cc0044, 8px 8px 0px #660022; /* Deep pink/magenta shadows */
             -webkit-text-stroke: 3px #000;
             line-height: 1;
             white-space: nowrap; 
@@ -860,7 +860,8 @@
                                 jkContainer.classList.add('text-explode');
                                 
                                 // ALIGNED BLAST: Pass '45%' so the blast perfectly covers the text!
-                                createExplosion(false, '45%');
+                                // Passed 'true' as the first argument to spawn Hearts!
+                                createExplosion(true, '45%');
                                 sfx.explosion(0.8);
                                 
                                 // 4. Reveal the Love Finale
