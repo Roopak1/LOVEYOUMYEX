@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Nesting Cartoon Gift Box</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+
+        :root {
+            --box-color: #ff3333;
+            --ribbon-color: #ffcc00;
+            --outline-color: #1a1a1a;
+            --box-scale: 1;
+
+            --box-w: 100px;
+            --box-h: 90px;
+            --lid-h: 30px;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #ff914d;
+            transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Luckiest Guy', cursive;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0.1) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #stage {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 80px;
+            z-index: 1;
+        }
+
+        #scale-wrapper {
+            transform: scale(var(--box-scale));
+            transform-origin: bottom center;
+            z-index: 10;
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* --- INDEPENDENT FLOOR SHADOW --- */
+        #floor-shadow {
+            position: absolute;
+            bottom: -10px;
+            left: calc(50% - 55px);
+            width: 110px;
+            height: 25px;
+            background-color: rgba(0, 0, 0, 0.25);
+            border-radius: 50%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        #floor-shadow.idle { animation: shadow-breathe 2.5s infinite ease-in-out; }
+        #floor-shadow.prep { animation: shadow-prep 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+        #floor-shadow.explode { animation: shadow-pop 0.3s ease-out forwards; }
+        #floor-shadow.drop-in { animation: shadow-drop 0.8s forwards; }
+
+        @keyframes shadow-breathe {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes shadow-prep {
+            0% { transform: scale(1); opacity: 1; }
+            10% { transform: scale(1.3); opacity: 1; }
+            25% { transform: scale(0.6); opacity: 0.3; }
+            40% { transform: scale(1.1); opacity: 1; }
+            45%, 55%, 65%, 75%, 85% { transform: scale(1.1); }
+            50%, 60%, 70%, 80% { transform: scale(1.15); }
+            92% { transform: scale(1.4); opacity: 1; }
+            100% { transform: scale(1.4); opacity: 1; }
+        }
+
+        @keyframes shadow-pop {
+            0% { transform: scale(1.4); opacity: 1; }
+            40% { transform: scale(2); opacity: 0; }
+            100% { transform: scale(0); opacity: 0; }
+        }
+
+        @keyframes shadow-drop {
+            0% { transform: scale(0.2); opacity: 0; animation-timing-function: cubic-bezier(0.5, 0, 1, 1); }
+            35% { transform: scale(1); opacity: 1; animation-timing-function: linear; }
+            40% { transform: scale(1.4); opacity: 1; animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+            60% { transform: scale(0.7); opacity: 0.5; animation-timing-function: cubic-bezier(0.5, 0, 1, 1); }
+            80% { transform: scale(1.2); opacity: 1; animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+            90% { transform: scale(0.9); opacity: 0.8; animation-timing-function: cubic-bezier(0.5, 0, 1, 1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* --- WRAPPERS & ANIMATIONS --- */
+        #gift-wrapper {
+            position: relative;
+            cursor: pointer;
+            transform-origin: bottom center;
+            transition: filter 0.3s;
+            z-index: 10;
+        }
+
+        #gift-wrapper:hover {
+            filter: brightness(1.1);
+        }
+
+        .idle {
+            animation: cartoon-breathe 2.5s infinite ease-in-out;
+        }
+
+        @keyframes cartoon-breathe {
+            0%, 100% { transform: scale(1, 1); }
+            50% { transform: scale(1.08, 0.92); }
+        }
+
+        .prep {
+            animation: refined-prep 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes refined-prep {
+            0% { transform: scale(1, 1); }
+            10% { transform: scale(1.4, 0.6); } 
+            25% { transform: scale(0.7, 1.5) translateY(-40px); } 
+            40% { transform: scale(1.2, 0.8) translateY(0); }
+            45%, 55%, 65%, 75%, 85% { transform: translateX(-8px) rotate(-3deg) scale(1.1); }
+            50%, 60%, 70%, 80% { transform: translateX(8px) rotate(3deg) scale(1.1); }
+            92% { transform: scale(1.6, 0.5); filter: brightness(1.5); } 
+            100% { transform: scale(1.6, 0.5); }
+        }
+
+        .prep .box-lid { animation: lid-jitter 0.15s infinite; }
+
+        @keyframes lid-jitter {
+            0% { transform: translate(0, 0) rotate(0); }
+            50% { transform: translate(-4px, -8px) rotate(-5deg); }
+            100% { transform: translate(4px, -4px) rotate(5deg); }
+        }
+
+        .explode .box-lid { animation: lid-launch 1.2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; }
+
+        @keyframes lid-launch {
+            0% { transform: translateY(0) rotate(0); }
+            15% { transform: translateY(-350px) rotate(360deg) scale(1.2); }
+            100% { transform: translateY(-150vh) rotate(1080deg) scale(0); opacity: 0; }
+        }
+
+        .explode .box-body { animation: body-pop 0.3s ease-out forwards; }
+
+        @keyframes body-pop {
+            0% { transform: scale(1.6, 0.5); opacity: 1; filter: brightness(1); }
+            40% { transform: scale(2.2, 2.2); opacity: 1; filter: brightness(2); }
+            100% { transform: scale(0); opacity: 0; filter: brightness(1); }
+        }
+
+        .drop-in { animation: box-drop 0.8s forwards; }
+
+        @keyframes box-drop {
+            0% { transform: translateY(-150vh) scale(0.8, 1.2); animation-timing-function: cubic-bezier(0.5, 0, 1, 1); }
+            35% { transform: translateY(0) scale(1, 1); animation-timing-function: linear; }
+            40% { transform: translateY(0) scale(1.6, 0.4); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+            60% { transform: translateY(-120px) scale(0.9, 1.1); animation-timing-function: cubic-bezier(0.5, 0, 1, 1); }
+            80% { transform: translateY(0) scale(1.2, 0.8); animation-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+            90% { transform: translateY(-25px) scale(0.95, 1.05); animation-timing-function: cubic-bezier(0.5, 0, 1, 1); }
+            100% { transform: translateY(0) scale(1, 1); }
+        }
+
+        /* --- BOX COMPONENTS --- */
+        .box-body {
+            width: var(--box-w);
+            height: var(--box-h);
+            background-color: var(--box-color);
+            border: 5px solid var(--outline-color);
+            border-radius: 8px;
+            position: relative;
+            box-shadow: inset 6px 6px 0px rgba(255, 255, 255, 0.4), inset -6px -6px 0px rgba(0, 0, 0, 0.25);
+            z-index: 2;
+        }
+
+        .box-body::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 100%;
+            background-color: var(--ribbon-color);
+            border-left: 5px solid var(--outline-color);
+            border-right: 5px solid var(--outline-color);
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            box-sizing: border-box;
+            box-shadow: inset 4px 0 0 rgba(255,255,255,0.4), inset -4px 0 0 rgba(0,0,0,0.2);
+        }
+
+        .box-lid {
+            width: calc(var(--box-w) + 16px);
+            height: var(--lid-h);
+            background-color: var(--box-color);
+            border: 5px solid var(--outline-color);
+            border-radius: 6px;
+            position: absolute;
+            top: -30px; 
+            left: -8px;
+            box-shadow: inset 5px 5px 0px rgba(255, 255, 255, 0.4), inset -5px -5px 0px rgba(0, 0, 0, 0.25);
+            z-index: 4;
+            transform-origin: bottom center;
+        }
+
+        .box-lid::after {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 100%;
+            background-color: var(--ribbon-color);
+            border-left: 5px solid var(--outline-color);
+            border-right: 5px solid var(--outline-color);
+            left: 50%;
+            transform: translateX(-50%);
+            top: 0;
+            box-sizing: border-box;
+            box-shadow: inset 4px 0 0 rgba(255,255,255,0.4), inset -4px 0 0 rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .box-lid::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background-color: var(--ribbon-color);
+            border-top: 5px solid var(--outline-color);
+            border-bottom: 5px solid var(--outline-color);
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            box-sizing: border-box;
+            box-shadow: inset 0 3px 0 rgba(255,255,255,0.4), inset 0 -3px 0 rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        .bow {
+            position: absolute;
+            top: -45px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 64px;
+            z-index: 5;
+        }
+
+        .mini-box-projectile {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            z-index: 15;
+            transform-origin: bottom center;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* --- THE GRAND FINALE I LOVE YOU --- */
+        #finale-container {
+            position: absolute;
+            top: 45%; 
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 50;
+            display: none; 
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            pointer-events: none;
+            width: 100%; 
+        }
+
+        .finale-pop {
+            animation: giant-pop 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.4) forwards;
+        }
+
+        @keyframes giant-pop {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-20deg); }
+            50% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+        }
+
+        .giant-heart svg {
+            width: 150px;
+            height: 150px;
+            filter: drop-shadow(0px 10px 0px rgba(0,0,0,0.3));
+            animation: heartbeat 0.8s infinite alternate cubic-bezier(0.2, 0.8, 0.2, 1);
+            overflow: visible; 
+        }
+
+        .ily-text {
+            font-size: 65px;
+            color: #fff;
+            text-shadow: 4px 4px 0px #ff0055, 8px 8px 0px #660022;
+            -webkit-text-stroke: 3px #000;
+            line-height: 1;
+            margin-top: 15px; 
+            transform: rotate(-3deg);
+            white-space: nowrap; 
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.25); }
+        }
+
+        /* --- PARTICLES (CONFETTI, STARS & HEARTS) --- */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .confetti {
+            width: 12px;
+            height: 20px;
+            border: 2px solid #000;
+        }
+
+        .star {
+            width: 20px;
+            height: 20px;
+            background: var(--c);
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            border: none; 
+        }
+
+        .speed-line {
+            position: absolute;
+            background: white;
+            border-radius: 10px;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        /* --- FUNNY LABEL --- */
+        #funny-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 26px;
+            text-align: center;
+            -webkit-text-stroke: 2px #000;
+            z-index: 100;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .label-pop { animation: text-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        @keyframes text-pop {
+            0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+            50% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+            100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+
+        /* --- CARTOON CLICK INDICATOR --- */
+        .click-indicator {
+            position: absolute;
+            pointer-events: none; 
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            animation: click-pop 0.3s ease-out forwards;
+            font-size: 22px; /* Smaller font size */
+            font-weight: bold;
+            -webkit-text-stroke: 1.5px #1a1a1a;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            color: #ffffff; /* Constant white color */
+        }
+
+        @keyframes click-pop {
+            0% { transform: translate(-50%, -50%) scale(0) rotate(-15deg); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5) rotate(20deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="stage">
+        <div id="funny-label">DON'T CLICK THE GIFTBOX!</div>
+
+        <div id="finale-container">
+            <div class="giant-heart">
+                <svg viewBox="0 0 32 29.6">
+                    <path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z" fill="#ff3366" stroke="#000" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <div class="ily-text">I LOVE<br>YOU!</div>
+        </div>
+
+        <div id="scale-wrapper">
+            <div id="floor-shadow" class="idle"></div>
+            
+            <div id="gift-wrapper" class="idle">
+                <div class="box-lid">
+                    <div class="bow">
+                        <svg viewBox="0 0 100 80">
+                            <g stroke="var(--outline-color)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+                                <path d="M 50,45 C 30,55 15,75 25,80 C 35,70 45,55 50,50 Z" fill="var(--ribbon-color)" />
+                                <path d="M 50,45 C 70,55 85,75 75,80 C 65,70 55,55 50,50 Z" fill="var(--ribbon-color)" />
+                                <path d="M 50,35 C 10,0 -15,35 15,55 C 30,65 45,45 50,35 Z" fill="var(--ribbon-color)" />
+                                <path d="M 22,37 C 18,41 18,47 25,50" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4"/>
+                                <path d="M 50,35 C 90,0 115,35 85,55 C 70,65 55,45 50,35 Z" fill="var(--ribbon-color)" />
+                                <path d="M 78,37 C 82,41 82,47 75,50" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4"/>
+                                <rect x="36" y="24" width="28" height="22" rx="8" fill="var(--ribbon-color)" />
+                                <path d="M 42,28 C 46,26 54,26 58,28" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+                <div class="box-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('gift-wrapper');
+        const stage = document.getElementById('stage');
+        const shadow = document.getElementById('floor-shadow');
+        const label = document.getElementById('funny-label');
+        let isAnimating = false;
+        let currentStep = 0;
+
+        const stages = [
+            { box: '#ff3333', ribbon: '#ffcc00', bg: '#ff914d' }, 
+            { box: '#33ccff', ribbon: '#ff00ff', bg: '#4facfe' }, 
+            { box: '#66ff66', ribbon: '#ff3333', bg: '#28c76f' }, 
+            { box: '#9933ff', ribbon: '#33ffff', bg: '#9b51e0' }, 
+            { box: '#ff3399', ribbon: '#ffff33', bg: '#ff758c' }  
+        ];
+
+        const clickMessages = [
+            "", "OOPS!", "HEY! I SAID STOP!", "YOU'RE MAKING IT MAD!", "UH OH... IT'S CRITICAL!"
+        ];
+
+        const dropMessages = [
+            "DON'T CLICK THE GIFTBOX!", "DON'T CLICK IT AGAIN!", "SERIOUSLY, STOP!", "IT'S GETTING ANGRY!", "OKAY, NO MORE BOXES!"
+        ];
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) { audioCtx = new AudioContext(); }
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+        }
+
+        const sfx = {
+            windup: () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 1.5);
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.1);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.6);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 1.6);
+
+                const totalClicks = 35;
+                for (let i = 0; i < totalClicks; i++) {
+                    const progress = i / (totalClicks - 1); 
+                    const timeOffset = Math.pow(progress, 2.2) * 1.45; 
+                    const clickTime = audioCtx.currentTime + timeOffset;
+                    
+                    const clickOsc = audioCtx.createOscillator();
+                    const clickGain = audioCtx.createGain();
+                    const filter = audioCtx.createBiquadFilter();
+                    
+                    clickOsc.type = 'sawtooth'; 
+                    clickOsc.frequency.value = 150 + (progress * 400); 
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 800 + (progress * 1500);
+                    filter.Q.value = 2; 
+
+                    clickGain.gain.setValueAtTime(0, clickTime);
+                    clickGain.gain.linearRampToValueAtTime(0.08, clickTime + 0.005);
+                    clickGain.gain.exponentialRampToValueAtTime(0.001, clickTime + 0.04);
+                    
+                    clickOsc.connect(filter);
+                    filter.connect(clickGain);
+                    clickGain.connect(audioCtx.destination);
+                    
+                    clickOsc.start(clickTime);
+                    clickOsc.stop(clickTime + 0.05);
+                }
+            },
+            explosion: (volumeMult = 1) => {
+                const bufferSize = audioCtx.sampleRate * 0.5;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(2000, audioCtx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.4);
+
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.4 * volumeMult, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start(audioCtx.currentTime);
+
+                const osc = audioCtx.createOscillator();
+                const oscGain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.3);
+                oscGain.gain.setValueAtTime(0.5 * volumeMult, audioCtx.currentTime);
+                oscGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.connect(oscGain);
+                oscGain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.3);
+            },
+            launchZip: () => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(900, audioCtx.currentTime + 0.6);
+
+                filter.type = 'lowpass';
+                filter.Q.value = 10;
+                filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+                filter.frequency.exponentialRampToValueAtTime(2000, audioCtx.currentTime + 0.6);
+
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.05);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.65);
+
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + 0.7);
+
+                const pop = audioCtx.createOscillator();
+                const popGain = audioCtx.createGain();
+                pop.type = 'sine';
+                pop.frequency.setValueAtTime(400, audioCtx.currentTime);
+                pop.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+                popGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                popGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+                pop.connect(popGain);
+                popGain.connect(audioCtx.destination);
+                pop.start(audioCtx.currentTime);
+                pop.stop(audioCtx.currentTime + 0.05);
+            },
+            slideWhistle: (startFreq, endFreq, duration, vol = 0.1) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(startFreq, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + duration);
+                
+                gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.05);
+                gain.gain.setValueAtTime(vol, audioCtx.currentTime + duration - 0.05);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + duration);
+            },
+            boing: (pitchMultiplier = 1, volume = 0.2) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const lfo = audioCtx.createOscillator();
+                const lfoGain = audioCtx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300 * pitchMultiplier, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80 * pitchMultiplier, audioCtx.currentTime + 0.1);
+
+                lfo.type = 'sine';
+                lfo.frequency.setValueAtTime(20, audioCtx.currentTime);
+                lfo.frequency.linearRampToValueAtTime(5, audioCtx.currentTime + 0.6); 
+                
+                lfoGain.gain.setValueAtTime(30 * pitchMultiplier, audioCtx.currentTime);
+                lfoGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.6);
+                
+                lfo.connect(lfoGain);
+                lfoGain.connect(osc.frequency);
+
+                gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                lfo.start(audioCtx.currentTime);
+                osc.start(audioCtx.currentTime);
+                lfo.stop(audioCtx.currentTime + 0.6);
+                osc.stop(audioCtx.currentTime + 0.6);
+            },
+            loveReveal: () => {
+                const freqs = [261.63, 329.63, 392.00, 493.88, 523.25]; 
+                freqs.forEach((freq, i) => {
+                    setTimeout(() => {
+                        const osc = audioCtx.createOscillator();
+                        const gain = audioCtx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = freq;
+                        
+                        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+                        gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.1);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
+                        
+                        osc.connect(gain);
+                        gain.connect(audioCtx.destination);
+                        
+                        osc.start(audioCtx.currentTime);
+                        osc.stop(audioCtx.currentTime + 3.1);
+                    }, i * 80); 
+                });
+            }
+        };
+
+        function updateLabel(text) {
+            label.classList.remove('label-pop');
+            void label.offsetWidth; 
+            label.innerText = text;
+            label.classList.add('label-pop');
+        }
+
+        // --- GLOBAL CLICK INDICATOR LOGIC ---
+        document.addEventListener('click', (e) => {
+            const indicator = document.createElement('div');
+            indicator.className = 'click-indicator';
+            indicator.style.left = `${e.clientX}px`;
+            indicator.style.top = `${e.clientY}px`;
+            
+            // Use only the word "CLICK!" in solid white
+            indicator.innerText = 'CLICK!';
+            
+            document.body.appendChild(indicator);
+            
+            // Clean up the DOM element after animation ends
+            setTimeout(() => indicator.remove(), 300);
+        });
+
+        wrapper.addEventListener('click', () => {
+            if (isAnimating) return;
+            
+            // --- THE GRAND FINALE CHECK ---
+            if (currentStep >= stages.length - 1) {
+                isAnimating = true;
+                initAudio();
+                updateLabel("I WARNED YOU!!!");
+                
+                wrapper.classList.remove('idle');
+                wrapper.classList.add('prep');
+                shadow.classList.remove('idle');
+                shadow.classList.add('prep');
+                sfx.windup();
+
+                setTimeout(() => {
+                    wrapper.classList.remove('prep');
+                    shadow.classList.remove('prep');
+                    
+                    createExplosion(true); 
+                    sfx.explosion(1.5); 
+                    
+                    document.querySelector('.box-body').style.display = 'none';
+                    document.querySelector('.box-lid').style.display = 'none';
+                    shadow.style.display = 'none'; 
+                    
+                    document.body.style.background = '#1a1a1a'; 
+                    updateLabel("...");
+                    
+                    setTimeout(() => {
+                        const finale = document.getElementById('finale-container');
+                        finale.style.display = 'flex';
+                        finale.classList.add('finale-pop');
+                        
+                        document.body.style.background = 'radial-gradient(circle, #ff758c 0%, #ff0844 100%)';
+                        
+                        sfx.loveReveal();
+                        sfx.boing(3, 0.3); 
+                        
+                        updateLabel("JUST KIDDING!");
+                        
+                        setTimeout(() => {
+                            updateLabel("SURPRISEEE!");
+                        }, 2000);
+
+                    }, 800); 
+
+                }, 1600);
+                return; 
+            }
+
+            // --- NORMAL LOOP ---
+            isAnimating = true;
+            updateLabel(clickMessages[currentStep + 1]);
+            initAudio();
+
+            wrapper.classList.remove('idle');
+            wrapper.classList.add('prep');
+            shadow.classList.remove('idle');
+            shadow.classList.add('prep');
+            
+            sfx.windup();
+
+            setTimeout(() => {
+                wrapper.classList.remove('prep');
+                wrapper.classList.add('explode');
+                shadow.classList.remove('prep');
+                shadow.classList.add('explode');
+                
+                createExplosion(false);
+                sfx.explosion();
+                sfx.launchZip(); 
+                
+                const nextStage = stages[currentStep + 1];
+                const nextScale = Math.pow(0.8, currentStep + 1); 
+                
+                shootMiniBoxUp(nextStage, nextScale, Math.pow(0.8, currentStep));
+
+                setTimeout(() => {
+                    currentStep++;
+                    
+                    document.documentElement.style.setProperty('--box-color', nextStage.box);
+                    document.documentElement.style.setProperty('--ribbon-color', nextStage.ribbon);
+                    document.documentElement.style.setProperty('--box-scale', nextScale);
+
+                    wrapper.classList.remove('explode');
+                    wrapper.classList.add('drop-in');
+                    shadow.classList.remove('explode');
+                    shadow.classList.add('drop-in');
+                    
+                    sfx.slideWhistle(1500, 200, 0.35, 0.05);
+
+                    setTimeout(() => updateLabel(dropMessages[currentStep]), 150);
+
+                    document.body.style.backgroundColor = nextStage.bg;
+
+                    setTimeout(() => sfx.boing(1 + (currentStep * 0.2)), 280); 
+                    setTimeout(() => sfx.boing(1.5 + (currentStep * 0.2), 0.08), 640); 
+
+                    setTimeout(() => {
+                        wrapper.classList.remove('drop-in');
+                        wrapper.classList.add('idle');
+                        shadow.classList.remove('drop-in');
+                        shadow.classList.add('idle');
+                        isAnimating = false; 
+                    }, 850);
+
+                }, 700); 
+            }, 1600); 
+        });
+
+        function shootMiniBoxUp(nextStage, targetScale, currentScale) {
+            const mini = document.createElement('div');
+            mini.className = 'mini-box-projectile';
+            
+            mini.innerHTML = `
+                <div class="box-lid" style="top: -30px;">
+                    <div class="bow">
+                        <svg viewBox="0 0 100 80">
+                            <g stroke="var(--outline-color)" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+                                <path d="M 50,45 C 30,55 15,75 25,80 C 35,70 45,55 50,50 Z" fill="var(--ribbon-color)" />
+                                <path d="M 50,45 C 70,55 85,75 75,80 C 65,70 55,55 50,50 Z" fill="var(--ribbon-color)" />
+                                <path d="M 50,35 C 10,0 -15,35 15,55 C 30,65 45,45 50,35 Z" fill="var(--ribbon-color)" />
+                                <path d="M 22,37 C 18,41 18,47 25,50" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4"/>
+                                <path d="M 50,35 C 90,0 115,35 85,55 C 70,65 55,45 50,35 Z" fill="var(--ribbon-color)" />
+                                <path d="M 78,37 C 82,41 82,47 75,50" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4"/>
+                                <rect x="36" y="24" width="28" height="22" rx="8" fill="var(--ribbon-color)" />
+                                <path d="M 42,28 C 46,26 54,26 58,28" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="4"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+                <div class="box-body"></div>
+            `;
+            
+            mini.style.setProperty('--box-color', nextStage.box);
+            mini.style.setProperty('--ribbon-color', nextStage.ribbon);
+            stage.appendChild(mini);
+
+            mini.animate([
+                { transform: `translate(-50%, 0) scale(${currentScale})`, opacity: 1 },
+                { transform: `translate(-50%, -150vh) scale(${targetScale}) rotate(1080deg)`, opacity: 1 }
+            ], { duration: 700, easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)' }).onfinish = () => mini.remove();
+        }
+
+        function createExplosion(isMassive) {
+            const particleCount = isMassive ? 50 : 25;
+            const colors = ['#ff3333', '#ffcc00', '#33ccff', '#66ff66', '#ffffff', '#ff00ff'];
+            
+            for (let i = 0; i < (isMassive ? 18 : 12); i++) {
+                const line = document.createElement('div');
+                line.className = 'speed-line';
+                const angle = (i / (isMassive ? 18 : 12)) * 360;
+                line.style.width = (100 + Math.random() * 100) + 'px';
+                line.style.height = '6px';
+                line.style.left = '50%';
+                line.style.top = '70%';
+                line.style.transformOrigin = 'left center';
+                
+                stage.appendChild(line);
+
+                line.animate([
+                    { opacity: 0, transform: `rotate(${angle}deg) translateX(50px) scaleX(0)` },
+                    { opacity: 1, transform: `rotate(${angle}deg) translateX(80px) scaleX(1.5)`, offset: 0.2 },
+                    { opacity: 0, transform: `rotate(${angle}deg) translateX(${isMassive ? 400 : 300}px) scaleX(0.1)` }
+                ], { duration: 500, easing: 'ease-out' }).onfinish = () => line.remove();
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                
+                if (isMassive) {
+                    particle.className = 'particle heart';
+                    particle.innerHTML = '<svg viewBox="0 0 32 29.6" width="30" height="30"><path d="M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z" fill="#ff3366" stroke="#000" stroke-width="1.5"/></svg>';
+                } else if (Math.random() > 0.5) {
+                    particle.className = 'particle confetti';
+                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                } else {
+                    particle.className = 'particle star';
+                    particle.style.setProperty('--c', colors[Math.floor(Math.random() * colors.length)]);
+                }
+                
+                particle.style.left = '50%';
+                particle.style.top = '70%';
+                stage.appendChild(particle);
+
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = (isMassive ? 300 : 100) + Math.random() * 250;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity - 100;
+                const rot = Math.random() * 720 - 360;
+
+                particle.animate([
+                    { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${isMassive ? 1.5 : 0}) rotate(${rot}deg)`, opacity: 0 }
+                ], { duration: (isMassive ? 1200 : 700) + Math.random() * 500, easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)' }).onfinish = () => particle.remove();
+            }
+        }
+    </script>
+</body>
+</html>
