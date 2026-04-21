@@ -504,9 +504,60 @@
             50% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); opacity: 1; }
             100% { transform: translate(-50%, -50%) scale(1.5) rotate(20deg); opacity: 0; }
         }
+
+        /* --- START SCREEN OVERLAY --- */
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Classic cartoon striped background */
+            background: repeating-linear-gradient(45deg, #33ccff, #33ccff 40px, #29b8e6 40px, #29b8e6 80px);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.6s cubic-bezier(0.5, 0, 0.2, 1);
+        }
+
+        #start-screen.hidden {
+            transform: translateY(-100%); /* Slides up like a curtain */
+        }
+
+        #start-btn {
+            font-family: 'Luckiest Guy', cursive;
+            font-size: 35px;
+            padding: 20px 40px;
+            background-color: #ffcc00;
+            color: #ff3333;
+            border: 6px solid #1a1a1a;
+            border-radius: 16px;
+            cursor: pointer;
+            box-shadow: 6px 6px 0 #1a1a1a, inset 5px 5px 0px rgba(255, 255, 255, 0.5);
+            text-shadow: 2px 2px 0px #fff;
+            animation: start-breathe 1.2s infinite alternate ease-in-out;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        #start-btn:active {
+            transform: translate(4px, 4px) scale(0.95);
+            box-shadow: 2px 2px 0 #1a1a1a, inset 5px 5px 0px rgba(255, 255, 255, 0.5);
+            animation: none;
+        }
+
+        @keyframes start-breathe {
+            0% { transform: scale(1) rotate(-2deg); }
+            100% { transform: scale(1.05) rotate(2deg); }
+        }
     </style>
 </head>
 <body>
+
+    <!-- THE START SCREEN CURTAIN -->
+    <div id="start-screen">
+        <button id="start-btn">OPEN YOUR PRESENT!</button>
+    </div>
 
     <div id="stage">
         <div id="funny-label">DON'T CLICK THE GIFTBOX!</div>
@@ -776,6 +827,34 @@
             label.innerText = text;
             label.classList.add('label-pop');
         }
+
+        // --- START SCREEN LOGIC & FULLSCREEN ---
+        const startScreen = document.getElementById('start-screen');
+        const startBtn = document.getElementById('start-btn');
+
+        startBtn.addEventListener('click', () => {
+            // Request Fullscreen on user gesture
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => console.log(err));
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+
+            // Initialize audio engine instantly so it's ready
+            initAudio();
+            sfx.boing(2, 0.3); // Fun sound when starting
+
+            // Slide curtain away
+            startScreen.classList.add('hidden');
+            
+            // Remove from DOM completely after animation
+            setTimeout(() => {
+                startScreen.style.display = 'none';
+            }, 600);
+        });
 
         // --- GLOBAL CLICK INDICATOR LOGIC ---
         document.addEventListener('click', (e) => {
