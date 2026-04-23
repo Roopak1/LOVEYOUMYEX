@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Nesting Cartoon Gift Box</title>
+    <title>Gift Box</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
 
@@ -384,11 +384,11 @@
         }
 
         .ily-text {
-            font-size: 65px;
+            font-size: 55px; /* Slightly reduced to comfortably fit the 3rd name line */
             color: #fff;
             text-shadow: 4px 4px 0px #ff0055, 8px 8px 0px #660022;
             -webkit-text-stroke: 3px #000;
-            line-height: 1;
+            line-height: 1.1; /* Added a tiny bit of breathing room between lines */
             margin-top: 15px; 
             transform: rotate(-3deg);
             white-space: nowrap; 
@@ -527,14 +527,14 @@
 
         #start-btn {
             font-family: 'Luckiest Guy', cursive;
-            font-size: 35px;
-            padding: 20px 40px;
+            font-size: 26px; /* Reduced from 35px */
+            padding: 15px 30px; /* Reduced from 20px 40px */
             background-color: #ffcc00;
             color: #ff3333;
-            border: 6px solid #1a1a1a;
-            border-radius: 16px;
+            border: 5px solid #1a1a1a; /* Slightly thinner border */
+            border-radius: 12px;
             cursor: pointer;
-            box-shadow: 6px 6px 0 #1a1a1a, inset 5px 5px 0px rgba(255, 255, 255, 0.5);
+            box-shadow: 5px 5px 0 #1a1a1a, inset 4px 4px 0px rgba(255, 255, 255, 0.5);
             text-shadow: 2px 2px 0px #fff;
             animation: start-breathe 1.2s infinite alternate ease-in-out;
             transition: transform 0.1s, box-shadow 0.1s;
@@ -542,7 +542,7 @@
 
         #start-btn:active {
             transform: translate(4px, 4px) scale(0.95);
-            box-shadow: 2px 2px 0 #1a1a1a, inset 5px 5px 0px rgba(255, 255, 255, 0.5);
+            box-shadow: 2px 2px 0 #1a1a1a, inset 4px 4px 0px rgba(255, 255, 255, 0.5);
             animation: none;
         }
 
@@ -605,6 +605,21 @@
     </div>
 
     <script>
+        // ==========================================
+        // CONFIGURATION: CHANGE THE NAME HERE!
+        // ==========================================
+        function setRecipientName(name) {
+            const finalMessage = document.querySelector('.ily-text');
+            if (name.trim() === "") {
+                finalMessage.innerHTML = "I LOVE<br>YOU!";
+            } else {
+                finalMessage.innerHTML = `I LOVE<br>YOU,<br>${name.toUpperCase()}!`;
+            }
+        }
+
+        // SET THE NAME RIGHT HERE:
+        setRecipientName("RISHTA");
+
         const wrapper = document.getElementById('gift-wrapper');
         const stage = document.getElementById('stage');
         const shadow = document.getElementById('floor-shadow');
@@ -628,6 +643,18 @@
             "DON'T CLICK THE GIFTBOX!", "DON'T CLICK IT AGAIN!", "SERIOUSLY, STOP!", "IT'S GETTING ANGRY!", "OKAY, NO MORE BOXES!"
         ];
 
+        // --- NEW: MESSAGES FOR RULE BREAKERS ---
+        const earlyMessages = [
+            "HOLD YOUR HORSES!", "LET IT LAND FIRST!", "PATIENCE!", "IT'S STILL FALLING!", "TOO FAST!"
+        ];
+
+        const spamMessages = [
+            "STOP SPAMMING THE SCREEN!", "ARE YOU TRYING TO BREAK ME?!", "CALM DOWN, CLICK MONSTER!", "GIVE YOUR MOUSE A BREAK!", "OUCH! STOP THAT!"
+        ];
+
+        let rapidClickCount = 0;
+        let lastClickTime = 0;
+
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx = null;
 
@@ -644,7 +671,8 @@
                 osc.frequency.setValueAtTime(150, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 1.5);
                 gain.gain.setValueAtTime(0, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.05, audioCtx.currentTime + 0.1);
+                // INCREASED: Rising tone volume 0.15 -> 0.1875 (+25%)
+                gain.gain.linearRampToValueAtTime(0.1875, audioCtx.currentTime + 0.1);
                 gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.6);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
@@ -668,7 +696,8 @@
                     filter.Q.value = 2; 
 
                     clickGain.gain.setValueAtTime(0, clickTime);
-                    clickGain.gain.linearRampToValueAtTime(0.08, clickTime + 0.005);
+                    // INCREASED: Click ticking volume 0.2 -> 0.25 (+25%)
+                    clickGain.gain.linearRampToValueAtTime(0.25, clickTime + 0.005);
                     clickGain.gain.exponentialRampToValueAtTime(0.001, clickTime + 0.04);
                     
                     clickOsc.connect(filter);
@@ -693,7 +722,8 @@
                 filter.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.4);
 
                 const gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.4 * volumeMult, audioCtx.currentTime);
+                // INCREASED: Base noise volume 0.6 -> 0.75 (+25%)
+                gain.gain.setValueAtTime(0.75 * volumeMult, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
 
                 noise.connect(filter);
@@ -706,7 +736,8 @@
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(150, audioCtx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(20, audioCtx.currentTime + 0.3);
-                oscGain.gain.setValueAtTime(0.5 * volumeMult, audioCtx.currentTime);
+                // INCREASED: Base thump volume 0.7 -> 0.875 (+25%)
+                oscGain.gain.setValueAtTime(0.875 * volumeMult, audioCtx.currentTime);
                 oscGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 osc.connect(oscGain);
                 oscGain.connect(audioCtx.destination);
@@ -728,7 +759,8 @@
                 filter.frequency.exponentialRampToValueAtTime(2000, audioCtx.currentTime + 0.6);
 
                 gain.gain.setValueAtTime(0, audioCtx.currentTime);
-                gain.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.05);
+                // INCREASED: Launch zip volume 0.25 -> 0.3125 (+25%)
+                gain.gain.linearRampToValueAtTime(0.3125, audioCtx.currentTime + 0.05);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.65);
 
                 osc.connect(filter);
@@ -743,14 +775,16 @@
                 pop.type = 'sine';
                 pop.frequency.setValueAtTime(400, audioCtx.currentTime);
                 pop.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
-                popGain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                // INCREASED: Launch pop volume 0.4 -> 0.5 (+25%)
+                popGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
                 popGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
                 pop.connect(popGain);
                 popGain.connect(audioCtx.destination);
                 pop.start(audioCtx.currentTime);
                 pop.stop(audioCtx.currentTime + 0.05);
             },
-            slideWhistle: (startFreq, endFreq, duration, vol = 0.1) => {
+            // INCREASED: Default slide whistle volume 0.25 -> 0.3125 (+25%)
+            slideWhistle: (startFreq, endFreq, duration, vol = 0.3125) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = 'sine';
@@ -767,7 +801,8 @@
                 osc.start(audioCtx.currentTime);
                 osc.stop(audioCtx.currentTime + duration);
             },
-            boing: (pitchMultiplier = 1, volume = 0.2) => {
+            // INCREASED: Default boing volume 0.4 -> 0.5 (+25%)
+            boing: (pitchMultiplier = 1, volume = 0.5) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 const lfo = audioCtx.createOscillator();
@@ -808,7 +843,8 @@
                         osc.frequency.value = freq;
                         
                         gain.gain.setValueAtTime(0, audioCtx.currentTime);
-                        gain.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.1);
+                        // INCREASED: Love reveal 0.15 -> 0.1875 (+25%)
+                        gain.gain.linearRampToValueAtTime(0.1875, audioCtx.currentTime + 0.1);
                         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3);
                         
                         osc.connect(gain);
@@ -821,11 +857,33 @@
             }
         };
 
+        // --- NEW SMART LABEL SYSTEM ---
+        let currentExpectedLabel = "DON'T CLICK THE GIFTBOX!";
+        let labelTimeout = null;
+
         function updateLabel(text) {
             label.classList.remove('label-pop');
             void label.offsetWidth; 
             label.innerText = text;
             label.classList.add('label-pop');
+        }
+
+        // Sets the main, permanent label for the current sequence
+        function setMainLabel(text) {
+            currentExpectedLabel = text;
+            clearTimeout(labelTimeout);
+            updateLabel(text);
+        }
+
+        // Shows an angry message temporarily, then reverts back to the main label
+        function setTempLabel(text, duration = 1500) {
+            updateLabel(text);
+            clearTimeout(labelTimeout);
+            labelTimeout = setTimeout(() => {
+                if (label.innerText !== currentExpectedLabel) {
+                    updateLabel(currentExpectedLabel);
+                }
+            }, duration);
         }
 
         // --- START SCREEN LOGIC & FULLSCREEN ---
@@ -845,7 +903,8 @@
 
             // Initialize audio engine instantly so it's ready
             initAudio();
-            sfx.boing(2, 0.3); // Fun sound when starting
+            // INCREASED: Start button boing 0.6 -> 0.75 (+25%)
+            sfx.boing(2, 0.75); 
 
             // Slide curtain away
             startScreen.classList.add('hidden');
@@ -856,8 +915,28 @@
             }, 600);
         });
 
-        // --- GLOBAL CLICK INDICATOR LOGIC ---
+        // --- GLOBAL CLICK INDICATOR LOGIC & SPAM DETECTION ---
         document.addEventListener('click', (e) => {
+            if (e.target.id !== 'start-btn') initAudio(); // Ensure audio is alive for background clicks
+
+            // Spam Click Detection
+            const now = Date.now();
+            if (now - lastClickTime < 350) { // If clicking faster than 350ms per click
+                rapidClickCount++;
+                if (rapidClickCount > 4) { // 5 rapid clicks triggers the spam scolding
+                    // Make sure we don't interrupt the dramatic Grand Finale sequence!
+                    if (!(currentStep >= stages.length - 1 && isAnimating)) {
+                        const spamMsg = spamMessages[Math.floor(Math.random() * spamMessages.length)];
+                        setTempLabel(spamMsg); // Use temporary label for spam
+                        sfx.boing(0.4, 0.5); // Angry, low-pitched groan
+                    }
+                    rapidClickCount = 0; // Reset so they can be scolded again
+                }
+            } else {
+                rapidClickCount = 1;
+            }
+            lastClickTime = now;
+
             const indicator = document.createElement('div');
             indicator.className = 'click-indicator';
             indicator.style.left = `${e.clientX}px`;
@@ -868,13 +947,22 @@
         });
 
         wrapper.addEventListener('click', () => {
-            if (isAnimating) return;
+            if (isAnimating) {
+                // --- TOO EARLY CLICK DETECTION ---
+                // If they click the box while it's still shaking, exploding, or falling
+                if (!(currentStep >= stages.length - 1 && isAnimating)) {
+                    const earlyMsg = earlyMessages[Math.floor(Math.random() * earlyMessages.length)];
+                    setTempLabel(earlyMsg); // Use temporary label for early clicks
+                    sfx.boing(2.5, 0.3); // Annoyed, high-pitched squeak
+                }
+                return;
+            }
             
             // --- THE GRAND FINALE CHECK ---
             if (currentStep >= stages.length - 1) {
                 isAnimating = true;
                 initAudio();
-                updateLabel("I WARNED YOU!!!");
+                setMainLabel("I WARNED YOU!!!");
                 
                 wrapper.classList.remove('idle');
                 wrapper.classList.add('prep');
@@ -888,8 +976,9 @@
                     
                     stage.classList.add('stage-shake-active');
 
-                    createExplosion(true, '70%'); // Normal floor explosion
-                    sfx.explosion(1.5); 
+                    createExplosion(true, '70%'); 
+                    // INCREASED: Grand finale blast 1.5 -> 1.8 to keep it louder than the new normal
+                    sfx.explosion(1.8); 
                     
                     document.querySelector('.box-body').style.display = 'none';
                     document.querySelector('.box-lid').style.display = 'none';
@@ -897,7 +986,7 @@
                     
                     // --- START OF BLACK SCREEN ---
                     document.body.style.background = '#1a1a1a'; 
-                    updateLabel("...");
+                    setMainLabel("...");
 
                     // Show "THAT'S ALL..." IMMEDIATELY when the screen goes black
                     const fakeOut = document.getElementById('fake-out-container');
@@ -906,7 +995,8 @@
                     
                     fakeOut.style.display = 'flex';
                     fakeOut.classList.add('finale-pop');
-                    sfx.boing(0.8, 0.2); 
+                    // INCREASED: fakeOut pop boing 0.2 -> 0.25 (+25%)
+                    sfx.boing(0.8, 0.25); 
                     
                     setTimeout(() => {
                         stage.classList.remove('stage-shake-active');
@@ -914,7 +1004,8 @@
                         // 1. Drop "JUST KIDDING!" from the sky
                         jkContainer.style.display = 'flex';
                         jkContainer.classList.add('jk-drop');
-                        sfx.slideWhistle(1200, 300, 0.25, 0.2); // Falling whistle
+                        // REDUCED: Whistle volume lowered to 0.2
+                        sfx.slideWhistle(1200, 300, 0.25, 0.2); 
                         
                         // 2. EXACT moment of impact (250ms after drop starts)
                         setTimeout(() => {
@@ -922,9 +1013,9 @@
                             fakeOut.classList.remove('finale-pop');
                             fakeOut.classList.add('knocked-out');
                             
-                            // Heavy smack & fly away sound + screen shake
-                            sfx.boing(0.4, 0.5); 
-                            sfx.slideWhistle(400, 50, 0.5, 0.1); 
+                            // INCREASED: Smack volume 0.7 -> 0.875, whistle 0.2 -> 0.25 (+25%)
+                            sfx.boing(0.4, 0.875); 
+                            sfx.slideWhistle(400, 50, 0.5, 0.25); 
                             stage.classList.add('stage-shake-active');
                             setTimeout(() => stage.classList.remove('stage-shake-active'), 300);
 
@@ -938,10 +1029,9 @@
                                 jkContainer.classList.remove('jk-panic');
                                 jkContainer.classList.add('text-explode');
                                 
-                                // ALIGNED BLAST: Pass '45%' so the blast perfectly covers the text!
-                                // Passed 'true' as the first argument to spawn Hearts!
                                 createExplosion(true, '45%');
-                                sfx.explosion(0.8);
+                                // INCREASED: Text explosion 0.8 -> 1.0
+                                sfx.explosion(1.0);
                                 
                                 // 4. Reveal the Love Finale
                                 setTimeout(() => {
@@ -954,9 +1044,10 @@
                                     document.body.style.background = 'radial-gradient(circle, #ff758c 0%, #ff0844 100%)';
                                     
                                     sfx.loveReveal();
-                                    sfx.boing(3, 0.3); 
+                                    // INCREASED: Reveal boing 0.3 -> 0.375 (+25%)
+                                    sfx.boing(3, 0.375); 
                                     
-                                    updateLabel("SURPRISEEE!");
+                                    setMainLabel("SURPRISEEE!");
                                     setInterval(spawnAmbientHeart, 300);
 
                                 }, 350); // Wait for the text explosion to clear
@@ -973,7 +1064,7 @@
 
             // --- NORMAL LOOP ---
             isAnimating = true;
-            updateLabel(clickMessages[currentStep + 1]);
+            setMainLabel(clickMessages[currentStep + 1]);
             initAudio();
 
             wrapper.classList.remove('idle');
@@ -1010,14 +1101,16 @@
                     shadow.classList.remove('explode');
                     shadow.classList.add('drop-in');
                     
-                    sfx.slideWhistle(1500, 200, 0.35, 0.05);
+                    // INCREASED: Drop-in whistle 0.15 -> 0.1875 (+25%)
+                    sfx.slideWhistle(1500, 200, 0.35, 0.1875);
 
-                    setTimeout(() => updateLabel(dropMessages[currentStep]), 150);
+                    setTimeout(() => setMainLabel(dropMessages[currentStep]), 150);
 
                     document.body.style.backgroundColor = nextStage.bg;
 
+                    // INCREASED: Base boing is now 0.5. Secondary bounce 0.2 -> 0.25 (+25%)
                     setTimeout(() => sfx.boing(1 + (currentStep * 0.2)), 280); 
-                    setTimeout(() => sfx.boing(1.5 + (currentStep * 0.2), 0.08), 640); 
+                    setTimeout(() => sfx.boing(1.5 + (currentStep * 0.2), 0.25), 640); 
 
                     setTimeout(() => {
                         wrapper.classList.remove('drop-in');
@@ -1025,6 +1118,12 @@
                         shadow.classList.remove('drop-in');
                         shadow.classList.add('idle');
                         isAnimating = false; 
+                        
+                        // FIX: Force revert to the normal label as soon as the box is settled and safe to click
+                        clearTimeout(labelTimeout);
+                        if (label.innerText !== currentExpectedLabel) {
+                            updateLabel(currentExpectedLabel);
+                        }
                     }, 850);
 
                 }, 700); 
