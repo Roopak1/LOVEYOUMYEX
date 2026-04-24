@@ -62,6 +62,19 @@
             justify-content: center;
         }
 
+        /* --- HARDWARE ACCELERATION (PERFORMANCE BOOST) --- */
+        #gift-wrapper, #floor-shadow, .box-lid, .box-body, 
+        .mini-box-projectile, .particle, .speed-line, 
+        #finale-container, #fake-out-container, #jk-container,
+        .ambient-heart {
+            /* Tells the GPU to handle these layers ahead of time */
+            will-change: transform, opacity;
+            /* Forces GPU compositing on older/weaker mobile devices */
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            transform-style: preserve-3d;
+        }
+
         /* --- INDEPENDENT FLOOR SHADOW --- */
         #floor-shadow {
             position: absolute;
@@ -1176,25 +1189,32 @@
         // Updated with an originY parameter so we can control exactly where the blast happens
         function createExplosion(isMassive, originY = '70%') {
             const particleCount = isMassive ? 50 : 25;
+            const lineCount = isMassive ? 18 : 12;
             const colors = ['#ff3333', '#ffcc00', '#33ccff', '#66ff66', '#ffffff', '#ff00ff'];
             
-            for (let i = 0; i < (isMassive ? 18 : 12); i++) {
+            // PERFORMANCE FIX: Use a DocumentFragment to batch DOM insertions (prevents CPU lag spikes)
+            const fragment = document.createDocumentFragment();
+            const animationsToStart = [];
+            
+            for (let i = 0; i < lineCount; i++) {
                 const line = document.createElement('div');
                 line.className = 'speed-line';
-                const angle = (i / (isMassive ? 18 : 12)) * 360;
+                const angle = (i / lineCount) * 360;
                 line.style.width = (100 + Math.random() * 100) + 'px';
                 line.style.height = '6px';
                 line.style.left = '50%';
-                line.style.top = originY; // Use the dynamic vertical origin
+                line.style.top = originY; 
                 line.style.transformOrigin = 'left center';
                 
-                stage.appendChild(line);
+                fragment.appendChild(line);
 
-                line.animate([
-                    { opacity: 0, transform: `rotate(${angle}deg) translateX(50px) scaleX(0)` },
-                    { opacity: 1, transform: `rotate(${angle}deg) translateX(80px) scaleX(1.5)`, offset: 0.2 },
-                    { opacity: 0, transform: `rotate(${angle}deg) translateX(${isMassive ? 400 : 300}px) scaleX(0.1)` }
-                ], { duration: 500, easing: 'ease-out' }).onfinish = () => line.remove();
+                animationsToStart.push(() => {
+                    line.animate([
+                        { opacity: 0, transform: `rotate(${angle}deg) translateX(50px) scaleX(0)` },
+                        { opacity: 1, transform: `rotate(${angle}deg) translateX(80px) scaleX(1.5)`, offset: 0.2 },
+                        { opacity: 0, transform: `rotate(${angle}deg) translateX(${isMassive ? 400 : 300}px) scaleX(0.1)` }
+                    ], { duration: 500, easing: 'ease-out' }).onfinish = () => line.remove();
+                });
             }
 
             for (let i = 0; i < particleCount; i++) {
@@ -1212,8 +1232,8 @@
                 }
                 
                 particle.style.left = '50%';
-                particle.style.top = originY; // Use the dynamic vertical origin
-                stage.appendChild(particle);
+                particle.style.top = originY; 
+                fragment.appendChild(particle);
 
                 const angle = Math.random() * Math.PI * 2;
                 const velocity = (isMassive ? 300 : 100) + Math.random() * 250;
@@ -1221,11 +1241,19 @@
                 const ty = Math.sin(angle) * velocity - 100;
                 const rot = Math.random() * 720 - 360;
 
-                particle.animate([
-                    { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 },
-                    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${isMassive ? 1.5 : 0}) rotate(${rot}deg)`, opacity: 0 }
-                ], { duration: (isMassive ? 1200 : 700) + Math.random() * 500, easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)' }).onfinish = () => particle.remove();
+                animationsToStart.push(() => {
+                    particle.animate([
+                        { transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 },
+                        { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${isMassive ? 1.5 : 0}) rotate(${rot}deg)`, opacity: 0 }
+                    ], { duration: (isMassive ? 1200 : 700) + Math.random() * 500, easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)' }).onfinish = () => particle.remove();
+                });
             }
+
+            // Inject all 50+ particles into the DOM at the exact same time
+            stage.appendChild(fragment);
+            
+            // Start their Web Animations after they are securely in the DOM
+            animationsToStart.forEach(anim => anim());
         }
     </script>
 </body>
